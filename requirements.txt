@@ -4,3 +4,4 @@ mosestokenizer
 pycld2
 sqlitedict
 sentencepiece
+konoha
