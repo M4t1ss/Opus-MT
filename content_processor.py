@@ -1,11 +1,13 @@
 
 from apply_bpe import BPE
+from konoha import SentenceTokenizer
 from mosestokenizer import MosesSentenceSplitter, MosesPunctuationNormalizer, MosesTokenizer, MosesDetokenizer
 import sentencepiece
 
 class ContentProcessor():
     def __init__(self,  srclang,
             targetlang, sourcebpe=None, targetbpe=None,sourcespm=None,targetspm=None):
+        self.srclang = srclang
         self.bpe_source = None
         self.bpe_target = None
         self.sp_processor_source = None
@@ -46,7 +48,12 @@ class ContentProcessor():
             self.detokenizer = MosesDetokenizer(targetlang)
 
     def preprocess(self, srctxt):
-        sentSource = self.sentence_splitter([self.normalizer(srctxt)])
+        # sentSource = self.sentence_splitter([self.normalizer(srctxt)])
+        if self.srclang == "ja":
+            japaneseTokenizer = SentenceTokenizer()
+            sentSource = japaneseTokenizer.tokenize(srctxt)
+        else:
+            sentSource = self.sentence_splitter([srctxt])
         self.sentences=[]
         for s in sentSource:
             if self.tokenizer:

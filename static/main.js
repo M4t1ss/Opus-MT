@@ -9,6 +9,7 @@ const AUTONYMS = {
     es: 'español',
     fi: 'suomi',
     fr: 'français',
+    ja: 'Japanese',
     mai: 'मैथिली',
     ml: 'മലയാളം',
     mr: 'मराठी',

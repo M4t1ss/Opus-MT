@@ -33,10 +33,11 @@ class TranslatorWorker():
     @gen.coroutine
     def run(self):
         process.Subprocess.initialize()
-        self.p = process.Subprocess(['marian-server', '-c',
+        self.p = process.Subprocess(['/home/matiss/tools/marian-versions/marian-robin/marian-dev/build/marian-server', '-c',
                                      self.service['configuration'],
                                      '-p', self.service['port'],
                                      '--allow-unk',
+                                     '--tsv',
                                      # enables translation with a mini-batch size of 64, i.e. translating 64 sentences at once, with a beam-size of 6.
                                      '-b', '6',
                                      '--mini-batch', '64',
@@ -54,11 +55,19 @@ class TranslatorWorker():
     def translate(self, srctxt):
         ws = websocket.create_connection(self.ws_url)
         sentences = self.contentprocessor.preprocess(srctxt)
-        ws.send('\n'.join(sentences))
+        # Add the previous context if there is any
+        outSent = []
+        prev = ["","",""]
+        for sentence in sentences:
+            outSent.append(sentence + "\t" + " ".join(prev))
+            prev.pop(2)
+            prev.insert(0, sentence)
+        print(outSent)
+        ws.send('\n'.join(outSent))
         translatedSentences= ws.recv().split('\n')
         ws.close()
         translation = self.contentprocessor.postprocess(translatedSentences)
-        return ' '.join(translation)
+        return '\n'.join(translation)
 
 
 class ApiHandler(web.RequestHandler):
